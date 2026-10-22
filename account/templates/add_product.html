@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Product - VasuStyle</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-stone-100 min-h-screen">
+
+    <nav class="bg-stone-900 text-white px-8 py-5 flex justify-between items-center">
+
+        <div>
+            <h1 class="text-2xl font-bold">
+                VasuStyle
+            </h1>
+
+            <p class="text-sm text-stone-400">
+                Admin Panel
+            </p>
+        </div>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="bg-white text-stone-900 px-5 py-2 rounded-lg font-medium hover:bg-stone-200"
+        >
+            Dashboard
+        </a>
+
+    </nav>
+
+
+    <main class="max-w-6xl mx-auto p-8">
+
+        <div class="max-w-xl mx-auto">
+
+            <div class="bg-white rounded-2xl shadow-sm p-8">
+
+                {% if edit_product %}
+
+                <h2 class="text-3xl font-bold text-stone-900">
+                    Edit Product
+                </h2>
+
+                <p class="text-stone-500 mt-2 mb-6">
+                    Update product details
+                </p>
+
+                {% else %}
+
+                <h2 class="text-3xl font-bold text-stone-900">
+                    Add Product
+                </h2>
+
+                <p class="text-stone-500 mt-2 mb-6">
+                    Add a new product to VasuStyle
+                </p>
+
+                {% endif %}
+
+
+                <form method="POST" enctype="multipart/form-data">
+
+                    {% csrf_token %}
+
+                    {% if edit_product %}
+
+                    <input
+                        type="hidden"
+                        name="product_id"
+                        value="{{ edit_product.id }}"
+                    >
+
+                    {% endif %}
+
+
+                    <div class="mb-4">
+
+                        <label class="block mb-2 font-medium">
+                            Product Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="product_name"
+                            value="{{ edit_product.product_name|default:'' }}"
+                            placeholder="Enter product name"
+                            required
+                            class="w-full border border-stone-300 rounded-lg px-4 py-3 outline-none focus:border-stone-900"
+                        >
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label class="block mb-2 font-medium">
+                            Product Price
+                        </label>
+
+                        <input
+                            type="number"
+                            name="product_price"
+                            value="{{ edit_product.product_price|default:'' }}"
+                            placeholder="Enter product price"
+                            required
+                            class="w-full border border-stone-300 rounded-lg px-4 py-3 outline-none focus:border-stone-900"
+                        >
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label class="block mb-2 font-medium">
+                            Product Image
+                        </label>
+
+                        {% if edit_product and edit_product.product_image %}
+
+                        <img
+                            src="{{ edit_product.product_image.url }}"
+                            class="w-24 h-24 object-cover rounded-lg mb-3"
+                        >
+
+                        {% endif %}
+
+                        <input
+                            type="file"
+                            name="product_image"
+                            accept="image/*"
+                            {% if not edit_product %}required{% endif %}
+                            class="w-full border border-stone-300 rounded-lg px-4 py-3 bg-white"
+                        >
+
+                    </div>
+
+
+                    <div class="mb-6">
+
+                        <label class="block mb-2 font-medium">
+                            Product Description
+                        </label>
+
+                        <textarea
+                            name="product_description"
+                            placeholder="Enter product description"
+                            required
+                            rows="4"
+                            class="w-full border border-stone-300 rounded-lg px-4 py-3 outline-none focus:border-stone-900"
+                        >{{ edit_product.product_description|default:'' }}</textarea>
+
+                    </div>
+
+
+                    {% if edit_product %}
+
+                    <div class="flex gap-3">
+
+                        <button
+                            type="submit"
+                            class="flex-1 bg-stone-900 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition"
+                        >
+                            Update Product
+                        </button>
+
+                        <a
+                            href="{% url 'add_product' %}"
+                            class="flex-1 text-center bg-stone-300 text-stone-900 py-3 rounded-xl font-medium hover:bg-stone-400 transition"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                    {% else %}
+
+                    <button
+                        type="submit"
+                        class="w-full bg-stone-900 text-white py-3 rounded-xl font-medium hover:bg-stone-700 transition"
+                    >
+                        Add Product
+                    </button>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                {% for product in products %}
+
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+
+                    {% if product.product_image %}
+
+                    <img
+                        src="{{ product.product_image.url }}"
+                        alt="{{ product.product_name }}"
+                        class="w-full h-56 object-cover"
+                    >
+
+                    {% endif %}
+
+
+                    <div class="p-5">
+
+                        <h3 class="text-xl font-bold text-stone-900">
+                            {{ product.product_name }}
+                        </h3>
+
+                        <p class="text-lg font-semibold text-stone-700 mt-2">
+                            ₹{{ product.product_price }}
+                        </p>
+
+                        <p class="text-stone-500 mt-3">
+                            {{ product.product_description }}
+                        </p>
+
+
+                        <div class="flex gap-3 mt-5">
+
+                            <a
+                                href="{% url 'add_product' %}?edit={{ product.id }}"
+                                class="flex-1 text-center bg-stone-900 text-white px-4 py-2 rounded-lg hover:bg-stone-700"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                href="{% url 'delete_product' product.id %}"
+                                onclick="return confirm('Delete this product?')"
+                                class="flex-1 text-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                            >
+                                Delete
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% empty %}
+
+                <div class="col-span-full bg-white rounded-2xl p-8 text-center">
+
+                    <p class="text-stone-500">
+                        No products added yet.
+                    </p>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
